@@ -33,7 +33,6 @@ steal('//jquery/jquery.controller')
 	  },
 	      
 	  val : function(hsv) {
-		  console.log("canvas val called");
 	      var oldHue = this._hue;
 	      var oldSaturation = this._saturation;
 	      var oldValue = this._value;
