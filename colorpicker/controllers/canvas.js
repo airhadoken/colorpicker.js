@@ -41,23 +41,11 @@ steal('//jquery/jquery.controller')
 	      this._saturation = hsv.saturation;
 	      this._value = hsv.value;
 
+		  this.context.clearRect(0, 0, this.find("canvas").width(), this.find("canvas").height());
 		  this.updateMap();
 		  this.drawCrosshair();
 		  this.updateValueColumn();
-		  this.drawValueArrow();
-
-	      this.find(".crosshair")
-		.each(
-		      function() {
-			this.left = hsv.hue;
-			this.top = hsv.saturation;
-		      });
-	      this.find(".valueArrow")
-		.each(
-		      function() {
-			this.top = hsv.value;
-		      });
-	      
+		  this.drawValueArrow();	      
 	  },
 
 	  updateMap : function() {
@@ -102,7 +90,7 @@ steal('//jquery/jquery.controller')
 		},
 
 		drawValueArrow : function() {
-		  this.context.clearRect(this.Class.mapWidth + 10, 0, 8, this.Class.mapHeight);
+		  //this.context.clearRect(this.Class.mapWidth + 10, 0, 8, this.Class.mapHeight);
 		  this.context.beginPath();
 		  this.context.moveTo(this.Class.mapWidth + 10, this.Class.mapHeight - this._value - 5);
 		  this.context.lineTo(this.Class.mapWidth + 18, this.Class.mapHeight - this._value);
