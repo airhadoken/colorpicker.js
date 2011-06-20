@@ -1,3 +1,15 @@
+/**
+   colorpicker/controllers/canvas.js
+   (C) 2011 Bradley Momberger.
+   @version 1.0
+   Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
+
+   Notes:
+   This is the canvas controller.  It handles all the drawing routines and listens for clicks
+   on the canvas.  If a values update comes in through the tie plugin (calling the val() function)
+   it redraws the canvas with a new colormap and crosshair/arrow in the right places.  On a click
+   it packages up the new values and triggers a change on the canvas to alert the tie plugin.
+*/
 steal('//jquery/jquery.controller')
   .then(function(){
 	$.Controller("Colorpicker.Controllers.Canvas", {
