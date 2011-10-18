@@ -16,7 +16,7 @@ steal('//jquery/jquery.controller')
 	    //statics go here
 	    mapWidth : 360,
 	    mapHeight : 256,
-					 defaults : {hsv : { hue : 0, saturation : 0, value : 0}}
+					 defaults : {hsv : { hue : 0, saturation : 0, lightness : 0}}
 	  }, 
 	  {
 	    //prototypes go here
@@ -24,46 +24,48 @@ steal('//jquery/jquery.controller')
 	      this.context = this.find("canvas")[0].getContext('2d');
 	      this._hue = this.options.hsv.hue;
 	      this._saturation = this.options.hsv.saturation;
-	      this._value = this.options.hsv.value;
+	      this._lightness = this.options.hsv.lightness;
 
 	      this.updateMap();
 		  this.drawCrosshair();
-	      this.updateValueColumn();
-		  this.drawValueArrow();
+	      this.updateLightnessColumn();
+		  this.drawLightnessArrow();
 	  },
 	      
-	  val : function(hsv) {
+	  val : function(colorObj) {
 	      var oldHue = this._hue;
 	      var oldSaturation = this._saturation;
-	      var oldValue = this._value;
+	      var oldLightness = this._lightness;
+
+		  var hsv = colorObj.hue != null ? colorObj : $("#fields").controller().convertRGBtoHSL(colorObj);
 
 	      this._hue = hsv.hue;
 	      this._saturation = hsv.saturation;
-	      this._value = hsv.value;
+	      this._lightness = hsv.lightness;
 
 		  this.context.clearRect(0, 0, this.find("canvas").width(), this.find("canvas").height());
 		  this.updateMap();
 		  this.drawCrosshair();
-		  this.updateValueColumn();
-		  this.drawValueArrow();	      
+		  this.updateLightnessColumn();
+		  this.drawLightnessArrow();	      
 	  },
 
 	  updateMap : function() {
-        var valuePct = this._value * 100 / this.Class.mapHeight;
+        var lightnessPct = this._lightness * 100 / this.Class.mapHeight;
 	      for(var j = 0; j < this.Class.mapWidth; j++) {
 			this.context.beginPath();
 			this.context.rect(j, 0, 1, this.Class.mapHeight);
 			//HSL expressed in hsl(degrees, pct, pct)
 			var grad = this.context.createLinearGradient(j, this.Class.mapHeight, j+1, 0);
-			grad.addColorStop(0, ["hsl(", j, ",0%,", valuePct, "%)"].join(""));
-			grad.addColorStop(1, ["hsl(", j, ",100%,", valuePct, "%)"].join(""));
+			grad.addColorStop(0, ["hsl(", j, ",0%,", lightnessPct, "%)"].join(""));
+			grad.addColorStop(1, ["hsl(", j, ",100%,", lightnessPct, "%)"].join(""));
 			this.context.fillStyle=grad;
 			this.context.fill();
 			this.context.closePath();
 	      }
 	   },
 
-	   updateValueColumn : function() {
+	   updateLightnessColumn : function() {
 	      this.context.beginPath();
 	      this.context.rect(this.Class.mapWidth + 20, 0, 20, this.Class.mapHeight);
 	      var grad = this.context.createLinearGradient(
@@ -80,8 +82,8 @@ steal('//jquery/jquery.controller')
 	    },
 
 		drawCrosshair : function() {
-		  var valuePct = this._value * 100 / this.Class.mapHeight,
-			crosshairColor = (valuePct + 50) % 100;
+		  var lightnessPct = this._lightness * 100 / this.Class.mapHeight,
+			crosshairColor = (lightnessPct + 50) % 100;
 		  this.context.fillStyle = ["hsl(0,0%,", crosshairColor, "%)"].join("");
 		  this.context.fillRect(this._hue - 1, (this.Class.mapHeight - this._saturation) + 3, 3, 5);
 		  this.context.fillRect(parseInt(this._hue) + 3, this.Class.mapHeight - this._saturation - 1, 5, 3);
@@ -89,30 +91,30 @@ steal('//jquery/jquery.controller')
 		  this.context.fillRect(this._hue - 7, this.Class.mapHeight - this._saturation - 1, 5, 3);
 		},
 
-		drawValueArrow : function() {
+		drawLightnessArrow : function() {
 		  //this.context.clearRect(this.Class.mapWidth + 10, 0, 8, this.Class.mapHeight);
 		  this.context.beginPath();
-		  this.context.moveTo(this.Class.mapWidth + 10, this.Class.mapHeight - this._value - 5);
-		  this.context.lineTo(this.Class.mapWidth + 18, this.Class.mapHeight - this._value);
-		  this.context.lineTo(this.Class.mapWidth + 10, this.Class.mapHeight - this._value + 5);
+		  this.context.moveTo(this.Class.mapWidth + 10, this.Class.mapHeight - this._lightness - 5);
+		  this.context.lineTo(this.Class.mapWidth + 18, this.Class.mapHeight - this._lightness);
+		  this.context.lineTo(this.Class.mapWidth + 10, this.Class.mapHeight - this._lightness + 5);
 		  this.context.fillStyle = "hsl(0, 0%, 25%)";
 		  this.context.fill();
 		  this.context.closePath();
 		},
 
 	    "canvas click" : function(el, ev) {
-		  var x = ev.clientX - el.offset().left;
-		  var y = ev.clientY - el.offset().top;
+		  var x = ev.pageX - el.offset().left;
+		  var y = ev.pageY - el.offset().top;
 		  if(x < this.Class.mapWidth) { //in the map
 			this.element.trigger(
 			   "change", 
-			   {hue: x, saturation: this.Class.mapHeight - y, value: this._value}
+			   {hue: x, saturation: Math.max(0, this.Class.mapHeight - y), lightness: this._lightness}
 			   );
 		  } 
 		  else if(x >= this.Class.mapWidth + 20 && x < this.Class.mapWidth + 40) { //in the value column
 			this.element.trigger(
 			  "change", 
-			  {hue: this._hue, saturation: this._saturation, value: this.Class.mapHeight - y}
+			  {hue: this._hue, saturation: this._saturation, lightness: Math.max(0, this.Class.mapHeight - y)}
 			  );
 		  }
 		}

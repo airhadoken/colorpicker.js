@@ -1,0 +1,5 @@
+<% for(var x in this.fieldNames) { %><%= $.View(
+			  "//colorpicker/views/fields/show.ejs",
+			  { "id": x, "text": this.fieldNames[x] }) %>
+<% }
+ %>

@@ -9,31 +9,112 @@
    (calling the val() function below) and for changes when values are typed into the fields
    themselves.
 */
-steal("//jquery/jquery.controller")
+steal("//jquery/jquery.controller", "//jquery/jquery.view", "//jquery/jquery.view.ejs", "//jquery/jquery.controller.view")
+  .views("//colorpicker/views/fields/list.ejs", "//colorpicker/views/fields/show.ejs")
 .then(
 function(){
   $.Controller("Colorpicker.Controllers.Fields", {
-
+      hslFields : { 
+		 hue : "Hue (degrees)", 
+		 saturation : "saturation (0-" + MagicNumbers.MAX_SATURATION + ")", 
+		 lightness : "lightness (0-" + MagicNumbers.MAX_LIGHTNESS + ")"
+	  },
+      rgbFields : {	 
+				 red : "red (0-" + MagicNumbers.MAX_RED + ")",
+				 green : "green (0-" + MagicNumbers.MAX_GREEN + ")",
+				 blue : "blue (0-" + MagicNumbers.MAX_BLUE + ")"
+	  },
+	  init : function() { 
+	     this._super.apply(this, arguments); 
+         this.fields = $.extend({}, this.hslFields, this.rgbFields) 
+	  }
+				
 	},
     {
-	    init : function(hsv)
+	    init : function(hsl)
 		{
-		  this.val(hsv);
+          var self = this;
+		 	$(self.element).html( $.View(
+			  "//colorpicker/views/fields/list.ejs",
+			  { fieldNames: this.Class.fields}));
+			this.val(hsl);
 		},
-		'input keyup' : function() { this["input change"]() },
-		'input change' : function() 
+		'input keyup' : function(el, ev) { this["input change"](el, ev); },
+		'input change' : function(el, ev) 
 		{
-		  this.element.trigger("change", 
+		  if($(el).is("#red,#green,#blue")) {
+			   this.element.trigger("change", 
+									{red: this.find("#red").val(),
+										green: this.find("#green").val(),
+										blue: this.find("#blue").val()});
+		  } else {
+			  this.element.trigger("change", 
 					   {hue : this.find("#hue").val(), 
 						   saturation : this.find("#saturation").val(), 
-						   value : this.find("#value").val()});
+						   lightness : this.find("#lightness").val()});
+		  }
 		},
 
-		val : function(hsv)
+		val : function(colorObj)
 		{
-		  this.find("#hue").val(hsv.hue);
-		  this.find("#saturation").val(hsv.saturation);
-		  this.find("#value").val(hsv.value);
-		}
+		  if(colorObj.hue != null) {
+			this.find("#hue").val(colorObj.hue);
+			this.find("#saturation").val(colorObj.saturation);
+			this.find("#lightness").val(colorObj.lightness);
+			var rgb = this.convertHSLtoRGB(colorObj);
+			this.find("#red").val(rgb.r);
+			this.find("#green").val(rgb.g);
+			this.find("#blue").val(rgb.b);
+		  }
+		  else if(colorObj.red != null) {
+			this.find("#red").val(colorObj.red);
+			this.find("#green").val(colorObj.green);
+			this.find("#blue").val(colorObj.blue);
+			var hsl = this.convertRGBtoHSL(colorObj);
+			this.find("#hue").val(hsl.hue);
+			this.find("#saturation").val(hsl.saturation);
+			this.find("#lightness").val(hsl.lightness);			
+		  }
+		},
+
+		convertHSLtoRGB : function(hsl) {
+		var lightnessFrac = +(hsl.lightness) / (MagicNumbers.MAX_LIGHTNESS + 1),
+		  saturationFrac = +(hsl.saturation) / (MagicNumbers.MAX_SATURATION + 1),
+		  chroma = (1 - Math.abs(2 * lightnessFrac - 1)) * saturationFrac,
+		  hprime = +(hsl.hue) / 60,
+		  intermediate = chroma * (1 - Math.abs(hprime % 2 - 1)),
+		  lightnessMatcher = lightnessFrac - chroma / 2,
+		  X = parseInt((lightnessMatcher + intermediate) * 255),
+		  C = parseInt((chroma + lightnessMatcher) * 255),
+		  L = parseInt(lightnessMatcher * 255),
+		  candidates = [
+		  {r:C,g:X,b:L},
+		  {r:X,g:C,b:L},
+		  {r:L,g:C,b:X},
+		  {r:L,g:X,b:C},
+		  {r:X,g:L,b:C},
+		  {r:C,g:L,b:X}
+		  ];
+		  return candidates[Math.floor(hprime)] || {r:0,g:0,b:0};
+		  },
+
+		convertRGBtoHSL : function(rgb) {
+			var rFrac = +(rgb.red) / (MagicNumbers.MAX_RED + 1),
+			  gFrac = +(rgb.green) / (MagicNumbers.MAX_GREEN + 1),
+			  bFrac = +(rgb.blue) / (MagicNumbers.MAX_BLUE + 1),
+			  max = Math.max(rFrac, gFrac, bFrac),
+			  min = Math.min(rFrac, gFrac, bFrac),
+			  chroma = max - min,
+			  hPrime = chroma === 0 ? 0.5 //should be NaN but why bother 
+			  : max === rFrac ? ((gFrac - bFrac) / chroma % 6)
+			  : max === gFrac ? ((bFrac - rFrac) / chroma + 2)
+			  : ((rFrac - gFrac) / chroma + 4),
+			  hue = Math.floor((hPrime < 0 ? 1 + hPrime : hPrime) * (MagicNumbers.MAX_HUE + 1) / 6),
+			  lightness = (max + min) / 2,
+			  saturation = chroma === 0 ? 0 : chroma / (1 - Math.abs(2 * lightness - 1));
+			return {hue : hue, 
+				    lightness : Math.floor(lightness * MagicNumbers.MAX_LIGHTNESS), 
+				saturation : Math.floor(saturation * MagicNumbers.MAX_SATURATION)};
+		  }
 	});
 });

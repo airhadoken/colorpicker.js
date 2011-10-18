@@ -10,6 +10,15 @@
    shared by both controllers signals each controller to call its "val" function every time either
    controller's element receives a "change" event.
 */
+			window.MagicNumbers = {
+			  MAX_LIGHTNESS : 255,
+			  MAX_SATURATION : 255,
+			  MAX_HUE : 359,
+			  MAX_RED : 255,
+			  MAX_GREEN : 255,
+			  MAX_BLUE : 255
+			};
+
 steal('//jquery/jquery',
       '//jquery/jquery.lang', 
       '//jquery/jquery.class', 
@@ -18,12 +27,12 @@ steal('//jquery/jquery',
       '//jquery/jquery.tie'  ).css( 'colorpicker' )
   .controllers('//controllers/canvas', '//controllers/fields')
 	.then(function(){
-		var hsv = {hue : 0, saturation : 128, value : 128};
-		$("#content").colorpicker_canvas({hsv : hsv});
-		$("#fields").colorpicker_fields({hsv : hsv});
+		var hsl = {hue : 0, saturation : 128, lightness : 128};
+		$("#content").colorpicker_canvas({hsl : hsl});
+		$("#fields").colorpicker_fields({hsl : hsl});
 
-		$.Model("HSV");
-		var hsvModel = new HSV({hsv : hsv});
-		$("#content, #fields").tie(hsvModel, "hsv");
+		$.Model("HSL");
+		var hslModel = new HSL({hsl : hsl});
+		$("#content, #fields").tie(hslModel, "hsl");
 	});
 	
