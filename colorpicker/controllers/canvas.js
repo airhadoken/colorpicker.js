@@ -102,21 +102,37 @@ steal('//jquery/jquery.controller')
 		  this.context.closePath();
 		},
 
-	    "canvas click" : function(el, ev) {
+		"canvas mousedown" : function(el, ev) { 
+		  var x = ev.pageX - el.offset().left;
+		  if(x < this.Class.mapWidth)
+		        this.Class.dragging = "map"; 
+		  else if(x >= this.Class.mapWidth + 20 && x < this.Class.mapWidth + 40)
+			 this.Class.dragging = "column";
+		  else
+			this.Class.dragging = false;
+		  this["canvas mousemove"](el, ev); 
+		},
+	    "canvas mouseup" : function() { this.Class.dragging = false; },
+
+	    "canvas mousemove" : function(el, ev) {
+		  if(this.Class.dragging) {
 		  var x = ev.pageX - el.offset().left;
 		  var y = ev.pageY - el.offset().top;
-		  if(x < this.Class.mapWidth) { //in the map
+		  if(this.Class.dragging === "map") { //in the map
 			this.element.trigger(
 			   "change", 
-			   {hue: x, saturation: Math.max(0, this.Class.mapHeight - y), lightness: this._lightness}
+			   {hue: Math.min(x, this.Class.mapWidth), 
+				   saturation: Math.max(0, this.Class.mapHeight - y), 
+				   lightness: this._lightness}
 			   );
 		  } 
-		  else if(x >= this.Class.mapWidth + 20 && x < this.Class.mapWidth + 40) { //in the value column
+		  else if(this.Class.dragging === "column") { //in the value column
 			this.element.trigger(
 			  "change", 
 			  {hue: this._hue, saturation: this._saturation, lightness: Math.max(0, this.Class.mapHeight - y)}
 			  );
 		  }
+		}
 		}
     });
 });
