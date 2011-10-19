@@ -78,8 +78,8 @@ function(){
 		},
 
 		convertHSLtoRGB : function(hsl) {
-		var lightnessFrac = +(hsl.lightness) / (MagicNumbers.MAX_LIGHTNESS + 1),
-		  saturationFrac = +(hsl.saturation) / (MagicNumbers.MAX_SATURATION + 1),
+		var lightnessFrac = +(hsl.lightness) / (MagicNumbers.MAX_LIGHTNESS),
+		  saturationFrac = +(hsl.saturation) / (MagicNumbers.MAX_SATURATION),
 		  chroma = (1 - Math.abs(2 * lightnessFrac - 1)) * saturationFrac,
 		  hprime = +(hsl.hue) / 60,
 		  intermediate = chroma * (1 - Math.abs(hprime % 2 - 1)),
@@ -99,13 +99,13 @@ function(){
 		  },
 
 		convertRGBtoHSL : function(rgb) {
-			var rFrac = +(rgb.red) / (MagicNumbers.MAX_RED + 1),
-			  gFrac = +(rgb.green) / (MagicNumbers.MAX_GREEN + 1),
-			  bFrac = +(rgb.blue) / (MagicNumbers.MAX_BLUE + 1),
+			var rFrac = +(rgb.red) / (MagicNumbers.MAX_RED),
+			  gFrac = +(rgb.green) / (MagicNumbers.MAX_GREEN),
+			  bFrac = +(rgb.blue) / (MagicNumbers.MAX_BLUE),
 			  max = Math.max(rFrac, gFrac, bFrac),
 			  min = Math.min(rFrac, gFrac, bFrac),
 			  chroma = max - min,
-			  hPrime = chroma === 0 ? 0.5 //should be NaN but why bother 
+			  hPrime = chroma === 0 ? 3.0 //should be NaN but why bother 
 			  : max === rFrac ? ((gFrac - bFrac) / chroma % 6)
 			  : max === gFrac ? ((bFrac - rFrac) / chroma + 2)
 			  : ((rFrac - gFrac) / chroma + 4),
@@ -115,6 +115,14 @@ function(){
 			return {hue : hue, 
 				    lightness : Math.floor(lightness * MagicNumbers.MAX_LIGHTNESS), 
 				saturation : Math.floor(saturation * MagicNumbers.MAX_SATURATION)};
-		  }
+	    },
+		convertRGBtoYIQ : function(rgb) {
+			var rFrac = +(rgb.red) / (MagicNumbers.MAX_RED + 1),
+			  gFrac = +(rgb.green) / (MagicNumbers.MAX_GREEN + 1),
+			  bFrac = +(rgb.blue) / (MagicNumbers.MAX_BLUE + 1);
+			  return { y : 0.299 * rFrac + 0.587 * gFrac + 0.114 * bFrac,
+					   i : 0.595716 * rFrac - 0.274453 * gFrac - 0.321263 * bFrac,
+					   q : 0.211456 * rFrac - 0.522591 * gFrac + 0.311135 * bFrac};
+	    }
 	});
 });
