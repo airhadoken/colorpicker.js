@@ -1,7 +1,7 @@
 /**
    colorpicker.js
-   (C) 2011 Bradley Momberger.
-   @version 1.0
+   (C) 2011-2012 Bradley Momberger.
+   @version 1.1
    Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
 
    Notes:
@@ -25,14 +25,15 @@ steal('//jquery/jquery',
       '//jquery/jquery.controller',
 	  '//jquery/jquery.model',
       '//jquery/jquery.tie'  ).css( 'colorpicker' )
-  .controllers('//controllers/canvas', '//controllers/fields')
+  .controllers('//controllers/canvas', '//controllers/fields', '//controllers/preview')
 	.then(function(){
 		var hsl = {hue : 0, saturation : 128, lightness : 128};
 		$("#content").colorpicker_canvas({hsl : hsl});
 		$("#fields").colorpicker_fields({hsl : hsl});
+		$("#preview").colorpicker_preview({hsl : hsl});
 
 		$.Model("HSL");
 		var hslModel = new HSL({hsl : hsl});
-		$("#content, #fields").tie(hslModel, "hsl");
+		$("#content, #fields, #preview").tie(hslModel, "hsl");
 	});
 	

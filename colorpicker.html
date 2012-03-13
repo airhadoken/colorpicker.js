@@ -6,8 +6,16 @@
 	</head>
 	<body>
 	<div id='content'>
-	  <canvas id="colormap" width="400" height="276"></canvas>
-	  <div id="fields">
+	  <div id="colormap-container" style="width:48%;height:276px;float:left">
+		<canvas id="colormap" width="400" height="276" style="float:right"></canvas>
+	  </div>
+	  <div id="preview-container" style="width:48%; float:right">
+		<h4 style="margin-top:0">preview</h4>
+		<div id="preview-box" style="width: 200px;padding:2px;border:1px solid black">
+		  <div id="preview" style="width:200px;height:200px;position:relative">&nbsp;</div>
+		</div>
+	  </div>
+	  <div id="fields" style="clear:both">
 	  </div>
 	</div>
 		

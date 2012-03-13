@@ -1,7 +1,7 @@
 /**
    colorpicker/controllers/canvas.js
-   (C) 2011 Bradley Momberger.
-   @version 1.0
+   (C) 2011-2012 Bradley Momberger.
+   @version 1.1
    Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
 
    Notes:
@@ -116,8 +116,8 @@ steal('//jquery/jquery.controller')
 
 	    "canvas mousemove" : function(el, ev) {
 		  if(this.Class.dragging) {
-		  var x = ev.pageX - el.offset().left;
-		  var y = ev.pageY - el.offset().top;
+		  var x = parseInt(ev.pageX - el.offset().left);
+		  var y = parseInt(ev.pageY - el.offset().top);
 		  if(this.Class.dragging === "map") { //in the map
 			this.element.trigger(
 			   "change", 
