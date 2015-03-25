@@ -25,7 +25,7 @@ steal('//jquery/jquery',
       '//jquery/jquery.controller',
 	  '//jquery/jquery.model',
       '//jquery/jquery.tie'  ).css( 'colorpicker' )
-  .controllers('controllers/canvas', 'controllers/fields', 'controllers/preview')
+  .controllers('controllers/canvas.js', 'controllers/fields.js', 'controllers/preview.js')
 	.then(function(){
 		var hsl = {hue : 0, saturation : 128, lightness : 128};
 		$("#content").colorpicker_canvas({hsl : hsl});
